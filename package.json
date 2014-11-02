@@ -1,0 +1,33 @@
+{
+  "name": "riak-dc",
+  "version": "0.1.0",
+  "description": "A very, very tiny interface to Riak",
+  "main": "lib/riak-dc.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/avriette/riak-dc.git"
+  },
+  "keywords": [
+    "riak",
+    "synchronous",
+    "simple",
+    "promises",
+    "q"
+  ],
+  "author": "Jane Avriette <jane@cpan.org> (http://github.com/avriette)",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/avriette/riak-dc/issues"
+  },
+  "dependencies": {
+    "q": "*"
+  },
+  "homepage": "https://github.com/avriette/riak-dc"
+}
