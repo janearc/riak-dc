@@ -15,7 +15,7 @@ Sorry, I know it's a pain.
 
 * `Riak.init( hostname, port )`
 
-`init` takes two arguments: `hostname`, and `port`, which are what you would expect them to be. Note that this call is optional, and `riak-dc` defaults to `localhost`, and `8098`, respectively.
+`init` takes two arguments: `hostname`, and `port`, which are what you would expect them to be. Note that this call is optional, and defaults are `localhost` and `8098`, respectively.
 
 * `Riak.get_keys( bucket )`
 
