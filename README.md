@@ -7,10 +7,6 @@ Accordingly, I wrote a tiny little wrapper around `http`, and here is the produc
 
 It is my hope that the code behind this never actually exceeds the length of the documentation & test suite, and that anyone should be able to just `npm install riak-js` and be coding against a Riak quickly.
 
-### You will need a working Riak.
-
-Sorry, I know it's a pain.
-
 ### Exported Functions
 
 * `Riak.init( hostname, port )`
@@ -37,4 +33,4 @@ If you have omitted a key for storing the tuple, you will be returned a promise 
 
 * `Riak.del_tuple( bucket, key )`
 
-Should you wish to remove a tuple from your Riak, you must specify a bucket and a key.
+Should you wish to remove a tuple from your Riak, you must specify a bucket and a key. Returns what Riak returns; in the case you have tried to remove a tuple Riak doesn't know about, this is (a promise to) 'not found'.
