@@ -5,7 +5,7 @@ So, Basho does not have an official javascript interface to Riak. However, there
 
 Accordingly, I wrote a tiny little wrapper around `http`, and here is the product.
 
-It is my hope that the code behind this never actually exceeds the length of the documentation & test suite, and that anyone should be able to just `npm install riak-js` and be coding against a Riak quickly.
+It is my hope that the code behind this never actually exceeds the length of the documentation & test suite, and that anyone should be able to just `npm install riak-dc` and be coding against a Riak quickly.
 
 ### Exported Functions
 
