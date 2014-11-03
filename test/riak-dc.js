@@ -92,3 +92,18 @@ it( 'get_keys', function () {
 	} );
 
 } );
+
+it( 'del_tuple', function () {
+	nock( 'http://localhost:8098' )
+		.delete( '/riak/nodes/X0uzthV7wciJwNHjc2ymNqx4S5s' )
+		.reply( 204, '', { 'Content-Type': 'application/json' } );
+	
+	return Riak.del_tuple( 'nodes', 'X0uzthV7wciJwNHjc2ymNqx4S5s' ).then( function (r) {
+		// So this should never really happen, but Riak doesn't really od much on
+		// a successful delete.
+		//
+		if (r) {
+			assert.notEqual( r, 'not found' );
+		}
+	} );
+} );
