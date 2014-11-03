@@ -1,30 +1,25 @@
 var Riak   = require( '../lib/riak-dc.js' )
-	, assert = require( 'assert' );
+	, assert = require( 'assert' )
+	, nock   = require( 'nock' );
 
 it( 'Riak package initialised with test values', function () {
-	assert.equal(Riak.init( 'localhost', '80' ), 200)
+	assert.equal(Riak.init( 'localhost', '8098' ), 200)
 } );
 
 it( 'get_buckets', function () {
 	var buckets_rsp = { "buckets": [ "testing" ] };
 
-	var server = require('sinon').fakeServer.create();
-	server.autoRespond = true;
+	nock( 'http://localhost:8098', { "Content-Type": "application/json" } )
+		.get( '/riak/?buckets=true' )
+		.reply( 200, buckets_rsp );
 
-	server.requests[0].respondWith(
-		'/riak/?buckets=true'
-		[ 200, { "Content-Type": "application/json" } ],
-		JSON.stringify(buckets_rsp)
-	);
+	var pbuckets = Riak.get_buckets();
+	pbuckets.then( function (buckets) {
 
-	Riak.get_buckets().then( function (pbuckets) {
-
-		assert( pbuckets );
-		assert.equal( pbuckets.length, 0 );
-		assert.equal( pbuckets[0], 'testing' );
+		assert( buckets );
+		assert.equal( buckets.length, 1 );
+		assert.equal( buckets[0], 'testing' );
 	} );
-
-	server.restore();
 
 });
 
