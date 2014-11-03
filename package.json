@@ -4,8 +4,7 @@
   "description": "A very, very tiny interface to Riak",
   "main": "lib/riak-dc.js",
   "directories": {
-    "example": "examples",
-    "test": "test"
+    "test": "test",
     "bin": "bin"
   },
   "scripts": {
@@ -28,7 +27,13 @@
     "url": "https://github.com/avriette/riak-dc/issues"
   },
   "dependencies": {
-    "q": "*"
+    "q": "*",
+    "mocha": "*",
+    "nock": "*",
+    "chai": "*",
+    "nopt" : "*",
+    "nopt-usage" : "*",
+    "chai-as-promised": "*"
   },
   "homepage": "https://github.com/avriette/riak-dc"
 }
