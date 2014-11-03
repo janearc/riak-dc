@@ -13,7 +13,7 @@ it( 'Riak package initialised with test values', function () {
 it( 'get_buckets', function () {
 	var buckets_rsp = { "buckets": [ "testing" ] };
 
-	nock( 'http://localhost:8098', { "Content-Type": "application/json" } )
+	nock( 'http://localhost:8098', { 'Content-Type': 'application/json' } )
 		.get( '/riak/?buckets=true' )
 		.reply( 200, buckets_rsp );
 
@@ -30,8 +30,8 @@ it( 'put_tuple (without key)', function () {
 	nock( 'http://localhost:8098'  )
 		.post( '/riak/bucketname?returnbody=true' )
 		.reply( 200, put_tuple_rsp, {
-			"Content-Type": "application/json",
-			"Location": "/riak/bucketname/UQ47BRs5YSVepY2CEVrvuLY9EV7"
+			'Content-Type': 'application/json',
+			'Location': '/riak/bucketname/UQ47BRs5YSVepY2CEVrvuLY9EV7'
 		} );
 	return Riak.put_tuple( 'bucketname', put_tuple_rsp ).then( function ( key ) {
 		assert( key, 'a key was returned' );
@@ -46,8 +46,8 @@ it( 'put_tuple (with key)', function () {
 	nock( 'http://localhost:8098' )
 		.post( '/riak/bucketname/new_key_name?returnbody=true' )
 		.reply( 200, put_tuple_rsp, {
-			"Content-Type": "application/json",
-			"Location": "/riak/bucketname/new_key_name"
+			'Content-Type': 'application/json',
+			'Location': '/riak/bucketname/new_key_name'
 		} );
 
 	return Riak.put_tuple( 'bucketname', put_tuple_rsp, 'new_key_name' ).then( function ( key ) {
@@ -65,14 +65,30 @@ it( 'get_tuple', function () {
 
 	nock( 'http://localhost:8098' )
 		.get( '/riak/nodes/X0uzthV7wciJwNHjc2ymNqx4S5s' )
-		.reply( 200, node_rsp, { "Content-Type": "application/json" } );
+		.reply( 200, node_rsp, { 'Content-Type': 'application/json' } );
 
 	return Riak.get_tuple( 'nodes', 'X0uzthV7wciJwNHjc2ymNqx4S5s' ).then( function ( tuple ) {
 		var parsed_tuple = JSON.parse(tuple);
 		assert( tuple, 'tuple was not returned' );
 		assert( parsed_tuple, 'tuple parsed into json' );
 		assert.deepEqual( parsed_tuple, node_rsp, 'returned value was not what was expected.' );
+	} );
 
+} );
+
+it( 'get_keys', function () {
+	// riak_long_reply{{{
+	var riak_long_reply = {"props":{"name":"nodes","allow_mult":false,"basic_quorum":false,"big_vclock":50,"chash_keyfun":{"mod":"riak_core_util","fun":"chash_std_keyfun"},"dvv_enabled":false,"dw":"quorum","last_write_wins":false,"linkfun":{"mod":"riak_kv_wm_link_walker","fun":"mapreduce_linkfun"},"n_val":3,"notfound_ok":true,"old_vclock":86400,"postcommit":[],"pr":0,"precommit":[],"pw":0,"r":"quorum","rw":"quorum","small_vclock":50,"w":"quorum","young_vclock":20},"keys":["X0uzthV7wciJwNHjc2ymNqx4S5s"]};
+
+	// }}}
+
+	nock( 'http://localhost:8098' )
+		.get( '/riak/nodes?keys=true' )
+		.reply( 200, riak_long_reply, { 'Content-Type': 'application/json' } );
+
+	return Riak.get_keys( 'nodes' ).then( function (nodes) {
+		assert( nodes, 'Riak returned something' );
+		assert.deepEqual( nodes, [ 'X0uzthV7wciJwNHjc2ymNqx4S5s' ], 'list of nodes correct' );
 	} );
 
 } );
