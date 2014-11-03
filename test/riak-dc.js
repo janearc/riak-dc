@@ -1,6 +1,10 @@
 var Riak   = require( '../lib/riak-dc.js' )
 	, assert = require( 'assert' )
+	, chai   = require( 'chai' )
+	, cap    = require( 'chai-as-promised' )
 	, nock   = require( 'nock' );
+
+chai.use( cap );
 
 it( 'Riak package initialised with test values', function () {
 	assert.equal(Riak.init( 'localhost', '8098' ), 200)
@@ -13,31 +17,62 @@ it( 'get_buckets', function () {
 		.get( '/riak/?buckets=true' )
 		.reply( 200, buckets_rsp );
 
-	var pbuckets = Riak.get_buckets();
-	pbuckets.then( function (buckets) {
+	return Riak.get_buckets().then( function (buckets) {
+		assert( buckets, 'defined return value' );
+		assert.equal( buckets.length, 1, 'correct number of buckets' );
+		assert.equal( buckets[0], 'testing', 'bucket 0 looks to be what we expected' );
+	} );
+} );
 
-		assert( buckets );
-		assert.equal( buckets.length, 1 );
-		assert.equal( buckets[0], 'testing' );
+it( 'put_tuple (without key)', function () {
+	var put_tuple_rsp = { "json": "true" };
+
+	nock( 'http://localhost:8098'  )
+		.post( '/riak/bucketname?returnbody=true' )
+		.reply( 200, put_tuple_rsp, {
+			"Content-Type": "application/json",
+			"Location": "/riak/bucketname/UQ47BRs5YSVepY2CEVrvuLY9EV7"
+		} );
+	return Riak.put_tuple( 'bucketname', put_tuple_rsp ).then( function ( key ) {
+		assert( key, 'a key was returned' );
+		assert.equal( key, 'UQ47BRs5YSVepY2CEVrvuLY9EV7', 'returned key is the key Riak supplied' );
 	} );
 
-});
-
-/*
-var result = Riak.put_tuple( 'bucket', 'key', 'value' );
-var serial = Riak.put_tuple( 'a_new_bucket', {
-	keyname1 : 'keyvalue1',
-	keyname2 : 'keyvalue2'
 } );
-*/
 
-/*
-serial.then( function (tid) {
-	console.log( 'testing put_tuple and get_tuple');
-	console.log( 'looking for ' + tid );
-	var tuple = Riak.get_tuple( 'bucket', tid );
-	tuple.then( function (body) {
-		console.log( 'BODY: ' + body );
-	} )
+it( 'put_tuple (with key)', function () {
+	var put_tuple_rsp = { "json": "true" };
+
+	nock( 'http://localhost:8098' )
+		.post( '/riak/bucketname/new_key_name?returnbody=true' )
+		.reply( 200, put_tuple_rsp, {
+			"Content-Type": "application/json",
+			"Location": "/riak/bucketname/new_key_name"
+		} );
+
+	return Riak.put_tuple( 'bucketname', put_tuple_rsp, 'new_key_name' ).then( function ( key ) {
+		assert( key, 'a key was returned' );
+		assert.equal( key, 'new_key_name', 'returned key is the key we supplied' );
+	} );
 } );
-*/
+
+it( 'get_tuple', function () {
+	var node_rsp = {
+		"name":"first_node",
+		"instance_id":"i-f7b8de1c",
+		"availability_zone":"us-east-1a"
+	};
+
+	nock( 'http://localhost:8098' )
+		.get( '/riak/nodes/X0uzthV7wciJwNHjc2ymNqx4S5s' )
+		.reply( 200, node_rsp, { "Content-Type": "application/json" } );
+
+	return Riak.get_tuple( 'nodes', 'X0uzthV7wciJwNHjc2ymNqx4S5s' ).then( function ( tuple ) {
+		var parsed_tuple = JSON.parse(tuple);
+		assert( tuple, 'tuple was not returned' );
+		assert( parsed_tuple, 'tuple parsed into json' );
+		assert.deepEqual( parsed_tuple, node_rsp, 'returned value was not what was expected.' );
+
+	} );
+
+} );
