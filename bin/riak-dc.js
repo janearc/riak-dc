@@ -2,6 +2,8 @@
 // quick-and-dirty interface to riak from the shell
 //
 
+var Riak = require('riak-dc');
+
 // parse opts
 //
 // var clean_args = require( 'components/common/js/supplemental.js' ).fix_quoted_array( process.argv );
@@ -47,8 +49,6 @@ if (parsed['help']) {
 	console.log( usage );
 	process.exit(0); // success
 }
-
-var Riak = require( 'components/common/js/riak-dc.js' ); // our riak synchronous wrapper
 
 if (parsed['list-buckets']) {
 	// Display the buckets in Riak
