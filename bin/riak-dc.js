@@ -6,32 +6,33 @@ var Riak = require('riak-dc');
 
 // parse opts
 //
-// var clean_args = require( 'components/common/js/supplemental.js' ).fix_quoted_array( process.argv );
 var nopt = require('nopt')
 	, noptUsage = require('nopt-usage')
 	, Stream    = require('stream').Stream
 	, path      = require('path')
 	, knownOpts = {
-			'list-buckets' : [ Boolean, null ],
-			'list-keys'    : [ Boolean, null ],
-			'get-tuple'    : [ Boolean, null ],
-			'put-tuple'    : [ Boolean, null ],
-			'del-tuple'    : [ Boolean, null ],
-			'bucket'       : [ String, null ],
-			'key'          : [ String, null ],
-			'tuple'        : [ String ],
-			'help'         : [ Boolean, null ]
+			'list-buckets'   : [ Boolean, null ],
+			'list-keys'      : [ Boolean, null ],
+			'get-tuple'      : [ Boolean, null ],
+			'put-tuple'      : [ Boolean, null ],
+			'del-tuple'      : [ Boolean, null ],
+			'bucket'         : [ String, null ],
+			'key'            : [ String, null ],
+			'tuple'          : [ String ],
+			'help'           : [ Boolean, null ],
+			'ignore-empties' : [ Boolean ]
 		}
 	, description = {
-			'list-buckets' : 'Show all the buckets in riak',
-			'list-keys'    : 'List all keys in a bucket',
-			'get-tuple'    : 'Get a single tuple from a bucket/key pair',
-			'put-tuple'    : 'Attempts to write a tuple to Riak; returns the serial Riak generates',
-			'del-tuple'    : 'Attempts to delete a tuple front Riak; no return value',
-			'bucket'       : 'To specify a bucket for operations',
-			'key'          : 'To specify a key for operations',
-			'tuple'        : 'To specify tuple for operations - this must be base64-encoded',
-			'help'         : 'Sets the helpful bit.'
+			'list-buckets'   : 'Show all the buckets in riak',
+			'list-keys'      : 'List all keys in a bucket',
+			'get-tuple'      : 'Get a single tuple from a bucket/key pair',
+			'put-tuple'      : 'Attempts to write a tuple to Riak; returns the serial Riak generates',
+			'del-tuple'      : 'Attempts to delete a tuple front Riak; no return value',
+			'bucket'         : 'To specify a bucket for operations',
+			'key'            : 'To specify a key for operations',
+			'tuple'          : 'To specify tuple for operations - this must be base64-encoded',
+			'ignore-empties' : 'Ignores 0-byte tuples (silently)',
+			'help'           : 'Sets the helpful bit.'
 		}
 	, defaults = {
 			'help' : false
@@ -80,7 +81,15 @@ if (parsed['get-tuple']) {
 			, key = parsed['key']
 			, ptuple = Riak.get_tuple(bucket, key);
 
-		ptuple.then( console.log );
+		ptuple.then( function (k) {
+			if (k instanceof Error) {
+				if (!parsed['ignore-empties']) {
+					console.log( 'Zero-byte tuple found at ' + bucket + '/' + key );
+					process.exit(-255)
+				}
+			}
+			console.log( k )
+		} );
 	}
 	else {
 		console.log( 'You need to supply a bucket & key name if you want a tuple.' );
