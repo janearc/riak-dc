@@ -6,7 +6,6 @@ var Riak = require('riak-dc');
 
 // parse opts
 //
-// var clean_args = require( 'components/common/js/supplemental.js' ).fix_quoted_array( process.argv );
 var nopt = require('nopt')
 	, noptUsage = require('nopt-usage')
 	, Stream    = require('stream').Stream
