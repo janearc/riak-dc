@@ -17,9 +17,13 @@ It is my hope that the code behind this never actually exceeds the length of the
 
 `get_keys()` takes a single argument, the name of the bucket you'd like keys for, and returns a promise to a list of the keys in that bucket.
 
+Note that Riak does not care if this bucket does not exist. If you ask for the keys from a non-existent bucket, Riak will dutifully tell you the list of keys in that bucket is `[]`, which is what `get_keys` will return to you here.
+
 * `Riak.get_tuple( bucket, key )`
 
 `get_tuple()` takes two arguments, the name of the bucket and key you wish to have the value for. This is returned as a promised object, and will be whatever Riak has stored. Typically this is JSON, but you will need to parse that yourself (such as `JSON.parse(tuple)`), as it can be anything.
+
+In the event that Riak has stored a 0-byte tuple (that is, the bucket/key pair are valid, the HTTP request returns 200, but the record is empty), you will receive an Error. This is not strictly an error condition, but it is helpful to know that the request itself was at least successful (whereas returning nothing is not helpful).
 
 * `Riak.get_buckets( )`
 
@@ -33,4 +37,4 @@ If you have omitted a key for storing the tuple, you will be returned a promise 
 
 * `Riak.del_tuple( bucket, key )`
 
-Should you wish to remove a tuple from your Riak, you must specify a bucket and a key. Returns what Riak returns; in the case you have tried to remove a tuple Riak doesn't know about, this is (a promise to) 'not found'.
+Should you wish to remove a tuple from your Riak, you must specify a bucket and a key. Returns what Riak returns; in the case you have tried to remove a tuple Riak doesn't know about, Riak will return an Error.
