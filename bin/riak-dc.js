@@ -20,7 +20,8 @@ var nopt = require('nopt')
 			'key'            : [ String, null ],
 			'tuple'          : [ String ],
 			'help'           : [ Boolean, null ],
-			'ignore-empties' : [ Boolean ]
+			'ignore-empties' : [ Boolean ],
+			'ping'           : [ Boolean ]
 		}
 	, description = {
 			'list-buckets'   : 'Show all the buckets in riak',
@@ -32,6 +33,7 @@ var nopt = require('nopt')
 			'key'            : 'To specify a key for operations',
 			'tuple'          : 'To specify tuple for operations - this must be base64-encoded',
 			'ignore-empties' : 'Ignores 0-byte tuples (silently)',
+			'ping'           : 'Attempts to get a 200 off the Riak',
 			'help'           : 'Sets the helpful bit.'
 		}
 	, defaults = {
@@ -49,6 +51,11 @@ if (parsed['help']) {
 	console.log( 'Usage: ' );
 	console.log( usage );
 	process.exit(0); // success
+}
+
+if (parsed['ping']) {
+	var pping = Riak.ping();
+	pping.then( console.log );
 }
 
 if (parsed['list-buckets']) {
