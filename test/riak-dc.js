@@ -66,6 +66,22 @@ it( 'put_tuple (with key)', function () {
 	} );
 } );
 
+it( 'get_tuple (0-byte)', function () {
+	nock( 'http://localhost:8098' )
+		.get( '/riak/nodes/X0uzthV7wciJwNHjc2ymNqx4S5s' )
+		.reply( 200, undefined, { 'Content-Type': 'application/json' } );
+
+	return Riak.get_tuple( 'nodes', 'X0uzthV7wciJwNHjc2ymNqx4S5s' ).then( function ( tuple ) {
+		if (tuple.constructor == Error) {
+			// We have encountered a 0-byte tuple!
+			assert( 1, 'returned error' )
+		}
+		else {
+			assert( false, 'did not return an error' );
+		}
+	} );
+} );
+
 it( 'get_tuple', function () {
 	var node_rsp = {
 		'name':'first_node',
@@ -79,7 +95,7 @@ it( 'get_tuple', function () {
 
 	return Riak.get_tuple( 'nodes', 'X0uzthV7wciJwNHjc2ymNqx4S5s' ).then( function ( tuple ) {
 		var parsed_tuple = JSON.parse(tuple);
-		assert( tuple, 'tuple was not returned' );
+		assert( tuple, 'tuple was returned' );
 		assert( parsed_tuple, 'tuple parsed into json' );
 		assert.deepEqual( parsed_tuple, node_rsp, 'returned value was not what was expected.' );
 	} );
