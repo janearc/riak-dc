@@ -13,6 +13,10 @@ It is my hope that the code behind this never actually exceeds the length of the
 
 `init` takes two arguments: `hostname`, and `port`, which are what you would expect them to be. Note that this call is optional, and defaults are `localhost` and `8098`, respectively.
 
+* `Riak.ping()`
+
+Takes no arguments, returns a true value if the server gives a 200 response, and something false otherwise.
+
 * `Riak.get_keys( bucket )`
 
 `get_keys()` takes a single argument, the name of the bucket you'd like keys for, and returns a promise to a list of the keys in that bucket.

@@ -1,6 +1,10 @@
 {
   "name": "riak-dc",
+<<<<<<< HEAD
   "version": "0.1.4",
+=======
+  "version": "0.2.0",
+>>>>>>> a05a9e23455db586e7a7361c89310012601f7c6a
   "description": "A very, very tiny interface to Riak",
   "main": "lib/riak-dc.js",
   "directories": {
