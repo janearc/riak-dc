@@ -6,46 +6,55 @@ var Riak = require('riak-dc');
 
 // parse opts
 //
-var nopt = require('nopt')
-	, noptUsage = require('nopt-usage')
-	, Stream    = require('stream').Stream
-	, path      = require('path')
-	, knownOpts = {
-			'list-buckets'   : [ Boolean, null ],
-			'list-keys'      : [ Boolean, null ],
-			'get-tuple'      : [ Boolean, null ],
-			'put-tuple'      : [ Boolean, null ],
-			'del-tuple'      : [ Boolean, null ],
-			'bucket'         : [ String, null ],
-			'key'            : [ String, null ],
-			'tuple'          : [ String ],
-			'help'           : [ Boolean, null ],
-			'ignore-empties' : [ Boolean ],
-			'ping'           : [ Boolean ]
-		}
-	, description = {
-			'list-buckets'   : 'Show all the buckets in riak',
-			'list-keys'      : 'List all keys in a bucket',
-			'get-tuple'      : 'Get a single tuple from a bucket/key pair',
-			'put-tuple'      : 'Attempts to write a tuple to Riak; returns the serial Riak generates',
-			'del-tuple'      : 'Attempts to delete a tuple front Riak; no return value',
-			'bucket'         : 'To specify a bucket for operations',
-			'key'            : 'To specify a key for operations',
-			'tuple'          : 'To specify tuple for operations - this must be base64-encoded',
-			'ignore-empties' : 'Ignores 0-byte tuples (silently)',
-			'ping'           : 'Attempts to get a 200 off the Riak',
-			'help'           : 'Sets the helpful bit.'
-		}
-	, defaults = {
-			'help' : false
-		}
-	, shortHands = {
-			'h'            : [ '--help' ],
-		}
-	, parsed = nopt(knownOpts, process.argv)
-	, usage = noptUsage(knownOpts, shortHands, description, defaults)
+var parsed = require('sendak-usage').parsedown( {
+	'list-buckets'   : {
+		'description' : 'Show all the buckets in riak',
+		'type' : [ Boolean ],
+	},
+	'list-keys'      : {
+		'description' : 'List all keys in a bucket',
+		'type' : [ Boolean ],
+	},
+	'get-tuple'      : {
+		'description' : 'Get a single tuple from a bucket/key pair',
+		'type' : [ Boolean ],
+	},
+	'put-tuple'      : {
+		'description' : 'Attempts to write a tuple to Riak; returns the serial Riak generates',
+		'type' : [ Boolean ],
+	},
+	'del-tuple'      : {
+		'description' : 'Attempts to delete a tuple front Riak; no return value',
+		'type' : [ Boolean ],
+	},
+	'bucket'         : {
+		'description' : 'To specify a bucket for operations',
+		'type' : [ String ],
+	},
+	'key'            : {
+		'description' : 'To specify a key for operations',
+		'type' : [ String ],
+	},
+	'tuple'          : {
+		'description' : 'To specify tuple for operations - this must be base64-encoded',
+		'type' : [ String ],
+	},
+	'help'           : {
+		'type' : [ Boolean ],
+	},
+	'ignore-empties' : {
+		'description' : 'Ignores 0-byte tuples (silently)',
+		'type' : [ Boolean ],
+	},
+	'ping'           : {
+		'description' : 'Attempts to get a 200 off the Riak',
+		'type' : [ Boolean ]
+	}
+}, process.argv )
+	, usage = parsed[1]
+	, nopt  = parsed[0];
 
-if (parsed['help']) {
+if (nopt['help']) {
 	// Be halpful
 	//
 	console.log( 'Usage: ' );
@@ -53,23 +62,23 @@ if (parsed['help']) {
 	process.exit(0); // success
 }
 
-if (parsed['ping']) {
+if (nopt['ping']) {
 	var pping = Riak.ping();
 	pping.then( console.log );
 }
 
-if (parsed['list-buckets']) {
+if (nopt['list-buckets']) {
 	// Display the buckets in Riak
 	//
 	var pbuckets = Riak.get_buckets();
 	pbuckets.then( console.log );
 }
 
-if (parsed['list-keys']) {
+if (nopt['list-keys']) {
 	// Display the keys in a given bucket
 	//
-	if (parsed['bucket']) {
-		var bucket = parsed['bucket']
+	if (nopt['bucket']) {
+		var bucket = nopt['bucket']
 			, pkeys  = Riak.get_keys( bucket );
 		pkeys.then( console.log )
 	}
@@ -80,17 +89,17 @@ if (parsed['list-keys']) {
 	}
 }
 
-if (parsed['get-tuple']) {
+if (nopt['get-tuple']) {
 	// Display a given tuple (bucket/key pair)
 	//
-	if (parsed['bucket'] && parsed['key']) {
-		var bucket = parsed['bucket']
-			, key = parsed['key']
+	if (nopt['bucket'] && nopt['key']) {
+		var bucket = nopt['bucket']
+			, key = nopt['key']
 			, ptuple = Riak.get_tuple(bucket, key);
 
 		ptuple.then( function (k) {
 			if (k instanceof Error) {
-				if (!parsed['ignore-empties']) {
+				if (!nopt['ignore-empties']) {
 					console.log( 'Zero-byte tuple found at ' + bucket + '/' + key );
 					process.exit(-255)
 				}
@@ -105,20 +114,20 @@ if (parsed['get-tuple']) {
 	}
 }
 
-if (parsed['put-tuple']) {
+if (nopt['put-tuple']) {
 	// Place a tuple in Riak. Note that this needs to be a base64 encoded string.
 	//
-	if (parsed['bucket'] && parsed['tuple']) {
-		if (parsed['key'] && !parsed['i-mean-it']) {
+	if (nopt['bucket'] && nopt['tuple']) {
+		if (nopt['key'] && !nopt['i-mean-it']) {
 			console.log( 'Please let Riak decide the key to use for this tuple.' );
 			console.log( usage );
 			process.exit( -255 );
 		}
 
-		var third_arg = parsed['key'] ? parsed['key'] : undefined;
+		var third_arg = nopt['key'] ? nopt['key'] : undefined;
 
-		var bucket = parsed['bucket']
-			, tuple = new Buffer(parsed['tuple'], 'base64').toString('ascii')
+		var bucket = nopt['bucket']
+			, tuple = new Buffer(nopt['tuple'], 'base64').toString('ascii')
 			, presult = Riak.put_tuple(bucket, tuple, third_arg);
 
 		console.log( 'attempted to place ' + tuple + ' in Riak' );
