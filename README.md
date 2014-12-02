@@ -35,7 +35,7 @@ In the event that Riak has stored a 0-byte tuple (that is, the bucket/key pair a
 
 * `Riak.put_tuple( bucket, tuple, key )`
 
-Riak is very helpful in that it will provide you a key for the things you would store. So while in order to store something you must provide a bucket and the thing you would store (the tuple), the `key` argument is optional. If you supply a key, that will be provided as Riak for the tuple you have asked to store. User-supplied keys are useful for [key filters](http://docs.basho.com/riak/latest/dev/using/keyfilters/), if hierarchically-named keys is something you want.
+Riak is very helpful in that it will provide you a key for the things you would store. So while in order to store something you must provide a bucket and the thing you would store (the tuple), the `key` argument is optional. If you supply a key, that will be provided to Riak for the tuple you have asked to store. User-supplied keys are useful for [key filters](http://docs.basho.com/riak/latest/dev/using/keyfilters/), if hierarchically-named keys is something you want.
 
 If you have omitted a key for storing the tuple, you will be returned a promise for the key that Riak has provided.
 
