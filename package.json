@@ -1,6 +1,6 @@
 {
   "name": "riak-dc",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A very, very tiny interface to Riak",
   "main": "lib/riak-dc.js",
   "directories": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/avriette/riak-dc.git"
+    "url": "https://github.com/janearc/riak-dc.git"
   },
   "keywords": [
     "riak",
@@ -21,10 +21,10 @@
     "promises",
     "q"
   ],
-  "author": "Jane Avriette <jane@cpan.org> (http://github.com/avriette)",
+  "author": "Jane Arc <jane@cpan.org> (http://github.com/janearc)",
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/avriette/riak-dc/issues"
+    "url": "https://github.com/janearc/riak-dc/issues"
   },
   "dependencies": {
     "q": "*",
@@ -35,5 +35,5 @@
     "chai-as-promised": "*",
     "sendak-usage": ">=0.0.3"
   },
-  "homepage": "https://github.com/avriette/riak-dc"
+  "homepage": "https://github.com/janearc/riak-dc"
 }
