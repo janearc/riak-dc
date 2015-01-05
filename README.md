@@ -51,7 +51,6 @@ documentation & test suite, and that anyone should be able to just
   buckets Riak knows about.
 
 * `Riak.put_tuple( bucket, tuple, key )`
-<<<<<<< HEAD
   - Riak is very helpful in that it will provide you a key for the things you would
   store. So while in order to store something you must provide a bucket and the
   thing you would store (the tuple), the `key` argument is optional. If you supply
