@@ -15,10 +15,14 @@ documentation & test suite, and that anyone should be able to just
 
 ### Exported Functions
 
-* `Riak.init( hostname, port )`
+* `Riak.init( hostname, port, proxy )`
   - Takes two arguments: `hostname`, and `port`, which are what you would
   expect them to be. Note that this call is optional, and defaults are `localhost`
-  and `8098`, respectively.
+  and `8098`, respectively. If you wish to use an http proxy, you may pass an
+  object that looks like `{ host: 'localhost', port: '3128' }` and `riak-dc`
+  will attempt to use this proxy for all calls. You may also set the
+  environment variables `HTTP_PROXY_HOST` and `HTTP_PROXY_PORT`. Using `init()`
+  will override any environment variables you may have set.
 
 * `Riak.ping()`
   - Takes no arguments, returns a true value if the server gives a 200 response,
@@ -60,3 +64,8 @@ documentation & test suite, and that anyone should be able to just
   - Should you wish to remove a tuple from your Riak, you must specify a bucket and
   a key. Returns what Riak returns; in the case you have tried to remove a tuple
   Riak doesn't know about, Riak will return an Error.
+
+author
+====
+
+[@janearc](https://github.com/janearc), jane@cpan.org
