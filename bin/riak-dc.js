@@ -17,7 +17,7 @@ var parsed = require('sendak-usage').parsedown( {
 	},
 	'get-tuple'      : {
 		'description' : 'Get a single tuple from a bucket/key pair',
-		'type' : [ Boolean ],
+		'type' : [ Boolean, String ],
 	},
 	'put-tuple'      : {
 		'description' : 'Attempts to write a tuple to Riak; returns the serial Riak generates',
@@ -92,26 +92,34 @@ if (nopt['list-keys']) {
 if (nopt['get-tuple']) {
 	// Display a given tuple (bucket/key pair)
 	//
-	if (nopt['bucket'] && nopt['key']) {
-		var bucket = nopt['bucket']
-			, key = nopt['key']
-			, ptuple = Riak.get_tuple(bucket, key);
+	var bucket, key
+		, gt = nopt['get-tuple'];
 
-		ptuple.then( function (k) {
-			if (k instanceof Error) {
-				if (!nopt['ignore-empties']) {
-					console.log( 'Zero-byte tuple found at ' + bucket + '/' + key );
-					process.exit(-255)
-				}
-			}
-			console.log( k )
-		} );
+	if (new RegExp( '([^/]+)/(.*)$' ).test( gt.toString() )) {
+		bucket = gt.substr( 0, gt.indexOf( '/' ) );
+		key    = gt.substr( gt.indexOf( '/' ) + 1, gt.length );
+	}
+	else if (nopt['bucket'] && nopt['key']) {
+			bucket = nopt['bucket'];
+			key    = nopt['key'];
 	}
 	else {
 		console.log( 'You need to supply a bucket & key name if you want a tuple.' );
 		console.log( usage );
 		process.exit( -255 );
 	}
+
+	var ptuple = Riak.get_tuple(bucket, key);
+
+	ptuple.then( function (k) {
+		if (k instanceof Error) {
+			if (!nopt['ignore-empties']) {
+				console.log( 'Zero-byte tuple found at ' + bucket + '/' + key );
+				process.exit(-255)
+			}
+		}
+		console.log( k )
+	} );
 }
 
 if (nopt['put-tuple']) {
