@@ -7,49 +7,20 @@ var Riak = require('riak-dc');
 // parse opts
 //
 var parsed = require('sendak-usage').parsedown( {
-	'list-buckets'   : {
-		'description' : 'Show all the buckets in riak',
-		'type' : [ Boolean ],
-	},
-	'list-keys'      : {
-		'description' : 'List all keys in a bucket',
-		'type' : [ Boolean ],
-	},
-	'get-tuple'      : {
-		'description' : 'Get a single tuple from a bucket/key pair',
-		'type' : [ Boolean, String ],
-	},
-	'put-tuple'      : {
-		'description' : 'Attempts to write a tuple to Riak; returns the serial Riak generates',
-		'type' : [ Boolean ],
-	},
-	'del-tuple'      : {
-		'description' : 'Attempts to delete a tuple front Riak; no return value',
-		'type' : [ Boolean ],
-	},
-	'bucket'         : {
-		'description' : 'To specify a bucket for operations',
-		'type' : [ String ],
-	},
-	'key'            : {
-		'description' : 'To specify a key for operations',
-		'type' : [ String ],
-	},
-	'tuple'          : {
-		'description' : 'To specify tuple for operations - this must be base64-encoded',
-		'type' : [ String ],
-	},
-	'help'           : {
-		'type' : [ Boolean ],
-	},
-	'ignore-empties' : {
-		'description' : 'Ignores 0-byte tuples (silently)',
-		'type' : [ Boolean ],
-	},
-	'ping'           : {
-		'description' : 'Attempts to get a 200 off the Riak',
-		'type' : [ Boolean ]
-	}
+	'list-buckets'     : { 'type' : [ Boolean ], 'description' : 'Show all the buckets in riak', },
+	'list-keys'        : { 'type' : [ Boolean ], 'description' : 'List all keys in a bucket', },
+	'get-tuple'        : { 'type' : [ String ],  'description' : 'Get a single tuple from a bucket/key pair', },
+	'get-tuple-short'  : { 'type' : [ String ],  'description' : 'Get a single tuple from a bucket/key pair (1-argument)', },
+	'del-tuple-short'  : { 'type' : [ String ],  'description' : 'Delete a single tuple from a bucket/key pair (1-argument)', },
+	'put-tuple'        : { 'type' : [ Boolean ], 'description' : 'Attempts to write a tuple to Riak; returns the serial Riak generates', },
+	'del-tuple'        : { 'type' : [ Boolean ], 'description' : 'Attempts to delete a tuple front Riak; no return value', },
+	'bucket'           : { 'type' : [ String ],  'description' : 'To specify a bucket for operations', },
+	'key'              : { 'type' : [ String ],  'description' : 'To specify a key for operations', },
+	'tuple'            : { 'type' : [ String ],  'description' : 'To specify tuple for operations - this must be base64-encoded', },
+	'ignore-empties'   : { 'type' : [ Boolean ], 'description' : 'Ignores 0-byte tuples (silently)', },
+	'ping'             : { 'type' : [ Boolean ], 'description' : 'Attempts to get a 200 off the Riak', },
+
+	'help'           : { 'type' : [ Boolean ], },
 }, process.argv )
 	, usage = parsed[1]
 	, nopt  = parsed[0];
@@ -89,37 +60,62 @@ if (nopt['list-keys']) {
 	}
 }
 
-if (nopt['get-tuple']) {
+if (nopt['get-tuple'] || nopt['get-tuple-short'] || nopt['del-tuple'] || nopt['del-tuple-short']) {
 	// Display a given tuple (bucket/key pair)
 	//
 	var bucket, key
-		, gt = nopt['get-tuple'];
+		, gt = nopt['get-tuple-short']
+		, dt = nopt['del-tuple-short'];
 
-	if (new RegExp( '([^/]+)/(.*)$' ).test( gt.toString() )) {
+	if ((gt) && (new RegExp( '([^/]+)/(.*)$' ).test( gt.toString() ))) {
 		bucket = gt.substr( 0, gt.indexOf( '/' ) );
 		key    = gt.substr( gt.indexOf( '/' ) + 1, gt.length );
 	}
+	else if ((dt) && (new RegExp( '([^/]+)/(.*)$' ).test( dt.toString() ))) {
+		bucket = dt.substr( 0, dt.indexOf( '/' ) );
+		key    = dt.substr( dt.indexOf( '/' ) + 1, dt.length );
+	}
 	else if (nopt['bucket'] && nopt['key']) {
-			bucket = nopt['bucket'];
-			key    = nopt['key'];
+		bucket = nopt['bucket'];
+		key    = nopt['key'];
 	}
 	else {
-		console.log( 'You need to supply a bucket & key name if you want a tuple.' );
+		console.log( 'You need to supply a bucket & key name to specify a tuple.' );
+		console.log( 'Example: --bucket bucketname --key keyname' );
+		console.log( 'Example: --get-tuple-short bucketname/keyname' );
 		console.log( usage );
 		process.exit( -255 );
 	}
 
-	var ptuple = Riak.get_tuple(bucket, key);
+	if (nopt['get-tuple'] || gt) {
+		var ptuple = Riak.get_tuple(bucket, key);
 
-	ptuple.then( function (k) {
-		if (k instanceof Error) {
-			if (!nopt['ignore-empties']) {
-				console.log( 'Zero-byte tuple found at ' + bucket + '/' + key );
-				process.exit(-255)
+		ptuple.then( function (k) {
+			if (k instanceof Error) {
+				if (!nopt['ignore-empties']) {
+					console.log( 'Zero-byte tuple found at ' + bucket + '/' + key );
+					process.exit(-255)
+				}
 			}
-		}
-		console.log( k )
-	} );
+			console.log( k )
+		} );
+	}
+	else if (nopt['del-tuple'] || dt) {
+		var dtuple = Riak.del_tuple(bucket, key);
+		dtuple.then( function (k) {
+			if (k instanceof Error) {
+				if (!nopt['ignore-empties']) {
+					console.log( 'Zero-byte tuple found at ' + bucket + '/' + key );
+					process.exit(-255)
+				}
+			}
+			console.log( k )
+		} );
+	}
+	else {
+		console.log( 'Unclear what operation is intended here.' );
+		process.exit( -255 );
+	}
 }
 
 if (nopt['put-tuple']) {
