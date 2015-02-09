@@ -1,6 +1,6 @@
 {
   "name": "riak-dc",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "A very, very tiny interface to Riak",
   "main": "lib/riak-dc.js",
   "directories": {
@@ -33,6 +33,7 @@
     "chai": "*",
     "nopt" : "*",
     "chai-as-promised": "*",
+    "xact-id-tiny": "*",
     "sendak-usage": ">=0.0.3"
   },
   "homepage": "https://github.com/janearc/riak-dc"
