@@ -2,7 +2,6 @@
 
 var nopt = require('nopt')
 	, knownopts = {
-			'drop-prototypes' : [ Boolean ],
 			'dry-run'         : [ Boolean ],
 			'reap-empties'    : [ Boolean ],
 			'verbose'         : [ Boolean ]
