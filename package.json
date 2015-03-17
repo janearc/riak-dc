@@ -31,7 +31,8 @@
     "mocha": "*",
     "nock": "*",
     "chai": "*",
-    "nopt" : "*",
+    "minimist" : "*",
+    "log4js": "*",
     "chai-as-promised": "*",
     "xact-id-tiny": ">=0.0.5",
     "sendak-usage": ">=0.0.3"
